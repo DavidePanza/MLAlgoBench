@@ -139,9 +139,15 @@ def main() -> None:
         separation()
 
         st.markdown("# Data Preprocessing")
-        st.markdown("<br><h4>1 Drop Columns with Missing Values</h3>", unsafe_allow_html=True)
+<<<<<<< HEAD
+        st.markdown("<br><h4>1 Drop Columns with Missing Values</43>", unsafe_allow_html=True)
         na_threshold = st.slider("Select threshold of missing values to drop variables", 0, 100, 20)
-        st.markdown("<br><h4>2 Remove Outliers</h3>", unsafe_allow_html=True)
+        st.markdown("<br><h4>2 Remove Outliers</h4>", unsafe_allow_html=True)
+=======
+        st.markdown("<br><h4>1 Drop Columns with Missing Values</h4>", unsafe_allow_html=True)
+        na_threshold = st.slider("Select threshold of missing values to drop variables", 0, 100, 20)
+        st.markdown("<br><h4>2 Remove Outliers</h4>", unsafe_allow_html=True)
+>>>>>>> vars_to_list
         outliers_threshold = st.slider("Select z-threshold to drop outliers", 0, 6, 3)
 
         # Button to trigger column drop

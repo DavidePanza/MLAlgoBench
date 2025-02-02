@@ -2,3 +2,4 @@ data/
 *.docx
 test.py
 dev.ipynb
+dev/

@@ -1,0 +1,9 @@
+/* Target the slider with key="slider1" */
+.stSlider[data-baseweb="slider"] {
+    width: 300px !important;  /* Adjust width to your preference */
+}
+
+/* Another example for the second slider with key="slider2" */
+.stSlider[data-baseweb="slider"] {
+    width: 50px !important;  /* Adjust width to your preference */
+}

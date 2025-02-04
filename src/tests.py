@@ -6,10 +6,8 @@ def run_shapiro_test(df, numeric_features):
         stat, p = shapiro(df[col])
         print(f'{col}: {p}')
         if p < 0.05:
-            print(f'{col} is not normally distributed')
             not_normal.append(col)
         else:
-            print(f'{col} is normally distributed')
             normal.append(col)
     
     return normal, not_normal

@@ -6,7 +6,7 @@ import io
 def configure_logging():
     log_stream = io.StringIO()  # Create a StringIO buffer to capture logs
     handler = logging.StreamHandler(log_stream)
-    handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+    handler.setFormatter(logging.Formatter('%(message)s'))
     
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)

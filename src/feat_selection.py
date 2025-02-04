@@ -33,3 +33,9 @@ def select_vars(numeric_feat, categorical_feat):
         selected_categorical = [var for var in categorical_feat if st.checkbox(var, key=f"cat_{var}")]
 
     return selected_numeric, selected_categorical
+
+def drop_columns(df, selected_numeric, selected_categorical, target):
+    """Drop columns from DataFrame."""
+    cols_to_drop = [col for col in df.columns if col not in selected_numeric + selected_categorical + [target]]
+    df = df.drop(columns=cols_to_drop)
+    return df

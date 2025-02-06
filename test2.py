@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import os
 import numpy as np
+import base64
 from src.preprocessing import *
 from src.tests import *
 from src.feat_selection import *
@@ -9,6 +10,7 @@ from src.pipeline import *
 from src.logging import *
 from src.models import *
 from src.train_test import *
+from src.datasets import *
 
 
 def separation():
@@ -29,17 +31,6 @@ def configure_page() -> None:
     # metadata
     st.set_page_config(page_title="ML Algo Benchmarker", layout="wide")
 
-
-def configure_overview() -> None:
-    st.markdown(
-    "<h1 style='text-align: center;'>Overview</h1>",
-    unsafe_allow_html=True
-    )
-    breaks(2)
-    st.markdown(
-        "This app compares the performance of different machine learning algorithms."
-    )
-
 def reset_session_state():
     """Resets all session state variables."""
     st.session_state.clear()  # Clears everything
@@ -55,21 +46,98 @@ def upload_files():
     
     return pd.read_csv(uploaded_file)  # Read and return the DataFrame
 
+def get_base64_encoded_image(image_path):
+    """Reads an image file and encodes it to Base64."""
+    with open(image_path, "rb") as img_file:
+        return base64.b64encode(img_file.read()).decode()
+
 def main():
     configure_page()
-    configure_overview()
+    image_path = "./image/background4.jpeg"  # Replace with your actual image path
+    base64_image = get_base64_encoded_image(image_path)
+    # Inject CSS for the background and title overlay
+    st.markdown(
+        f"""
+        <style>
+        /* Background container with image */
+        .bg-container {{
+            position: relative;
+            background-image: url("data:image/png;base64,{base64_image}");
+            background-size: cover;
+            background-position: 50% 15%;
+            height: 400px;  /* Adjust the height of the background */
+            width: 100%;
+            filter: brightness(135%); /* Dim the brightness of the image */
+            border-radius: 200px;  /* Makes the container's corners rounded */
+            overflow: hidden;  
+        }}
+
+        /* Overlay for dimming effect */
+        .bg-container::after {{
+            content: '';
+            position: absolute;
+            top: ;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(20, 20, 20, 0.5); /* Semi-transparent black overlay */
+            z-index: 1; /* Ensure the overlay is above the image */
+        }}
+
+        /* Overlay title styling */
+        .overlay-title {{
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;   /* Title color */
+            font-size: 70px;
+            font-weight: bold;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7); /* Shadow for better visibility */
+            text-align: center;
+            z-index: 2; /* Ensure the title is above the overlay */
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # Create the background container with an overlaid title
+    st.markdown(
+        """
+        <div class="bg-container">
+            <div class="overlay-title">Overview</div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    breaks(2)
+    st.write("This app compares the performance of different machine learning algorithms.")
     breaks(1)
     logger, log_stream = configure_logging()  # Get logger and log stream
     logging_level = st.selectbox("Select logging level", ['INFO', 'DEBUG', 'WARNING'])
     toggle_logging(logging_level, logger)
-
+    breaks(2)   
+    
     # Step 1: Upload file
+    st.write("Upload your data or experiment with one of the datasets provided:")
     df = upload_files()
-    logger.info(f"Data loaded: {df.shape[0]} rows and {df.shape[1]} columns\n")
+    breaks(2)
+
+    # display dataset images
+    if "selected_image" not in st.session_state:
+        st.session_state.selected_image = None
+    initialize_session_state()
+    images = initialize_images()
+    display_images(images)
+    df = download_dataset()
     separation()
+
     # If data is loaded, proceed
     if df is not None:
         st.session_state["data_loaded"] = True  # Mark that data is loaded
+        logger.info(f"Data loaded: {df.shape[0]} rows and {df.shape[1]} columns\n")
     else:
         st.stop()  # Stop execution if no data is uploaded
 
@@ -91,7 +159,7 @@ def main():
     logger.info(f"Categorical features: {' '.join(categorical_feat)}\n")
     logger.info(f"Selected numeric features: {' '.join(selected_numeric)}")
     logger.info(f"Selected categorical features: {' '.join(selected_categorical)}")
-    logger.info(f"--> Remaining columns after drop (in df): {' '.join(df.columns)}")
+    logger.info(f"--> Columns in df: {' '.join(df.columns)}")
 
     # Button to apply preprocessing
     breaks(2)
@@ -180,6 +248,9 @@ def main():
         if st.button("Select Models"):
             st.session_state["selected_models"] = selected_models
             st.session_state["model selected"] = True
+        
+        # Display logs
+        display_logs(log_stream)
 
     if st.session_state.get("feature selection", False) and st.session_state.get("preprocessed", False) and st.session_state.get("model selected", False):
 
@@ -187,10 +258,12 @@ def main():
         separation()
         st.markdown("<h1 style='text-align: center;'>Model Training</h1><br>", unsafe_allow_html=True)
         test_threshold = st.slider("Select size of test set (%)", 0, 100, 20)
-        logger.info(f"Target: {st.session_state.target}")
         logger.info(f"df columns: {df.keys(), df.shape[0]}")
         X_train, X_test, y_train, y_test = prepare_data(df, st.session_state.target, test_threshold)
-        logger.info(f"train size: {X_train.shape[0], y_train.shape[0]}")
+        logger.info(f"Columns annd rows in df: {df.keys(), df.shape[0]}")
+        logger.info(f"N° cols in train: {X_train.columns}")
+        logger.info(f"N° cols in test: {y_train.to_frame().columns}")
+        logger.info(f"train size: {X_train.shape[0]}, test_size:{X_test.shape[0]}")
         
         breaks(2)
         if st.button("Train Models"):

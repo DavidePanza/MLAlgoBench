@@ -11,121 +11,59 @@ from src.logging import *
 from src.models import *
 from src.train_test import *
 from src.datasets import *
+from src.utils import *
 
-
-def separation():
-    st.write("\n")
-    st.markdown("---")
-
-def breaks(n=1):
-    if n == 1:
-        st.markdown("<br>",unsafe_allow_html=True)
-    elif n == 2:
-        st.markdown("<br><br>",unsafe_allow_html=True)
-    elif n == 3:
-        st.markdown("<br><br><br>",unsafe_allow_html=True)
-    else:
-        st.markdown("<br><br><br><br>",unsafe_allow_html=True)
-
-def configure_page() -> None:
-    # metadata
-    st.set_page_config(page_title="ML Algo Benchmarker", layout="wide")
 
 def reset_session_state():
     """Resets all session state variables."""
     st.session_state.clear()  # Clears everything
 
 def upload_files():
-    """Upload a CSV file and return it as a DataFrame."""
-    uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
-    
-    # If no file is uploaded, reset everything
-    if uploaded_file is None:
+    uploaded_file = st.file_uploader("Choose a file")
+    if uploaded_file is not None:
+        # Read the uploaded CSV file
+        df = pd.read_csv(uploaded_file)
+        # Overwrite the session state DataFrame
+        st.session_state.df = df  
+        st.session_state.data_source = "upload"  # (optional) tag the source if needed
+        st.write("Uploaded file loaded.")
+        return df
+    else:
         reset_session_state()
         return None
-    
-    return pd.read_csv(uploaded_file)  # Read and return the DataFrame
 
-def get_base64_encoded_image(image_path):
-    """Reads an image file and encodes it to Base64."""
-    with open(image_path, "rb") as img_file:
-        return base64.b64encode(img_file.read()).decode()
+
+# def upload_files():
+#     """Upload a CSV file and return it as a DataFrame."""
+#     uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
+    
+#     # If no file is uploaded, reset everything
+#     if uploaded_file is None:
+#         reset_session_state()
+#         return None
+    
+#     return pd.read_csv(uploaded_file)  # Read and return the DataFrame
 
 def main():
+    # Configure page
     configure_page()
-    image_path = "./image/background4.jpeg"  # Replace with your actual image path
-    base64_image = get_base64_encoded_image(image_path)
-    # Inject CSS for the background and title overlay
-    st.markdown(
-        f"""
-        <style>
-        /* Background container with image */
-        .bg-container {{
-            position: relative;
-            background-image: url("data:image/png;base64,{base64_image}");
-            background-size: cover;
-            background-position: 50% 15%;
-            height: 400px;  /* Adjust the height of the background */
-            width: 100%;
-            filter: brightness(135%); /* Dim the brightness of the image */
-            border-radius: 200px;  /* Makes the container's corners rounded */
-            overflow: hidden;  
-        }}
-
-        /* Overlay for dimming effect */
-        .bg-container::after {{
-            content: '';
-            position: absolute;
-            top: ;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(20, 20, 20, 0.5); /* Semi-transparent black overlay */
-            z-index: 1; /* Ensure the overlay is above the image */
-        }}
-
-        /* Overlay title styling */
-        .overlay-title {{
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: white;   /* Title color */
-            font-size: 70px;
-            font-weight: bold;
-            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7); /* Shadow for better visibility */
-            text-align: center;
-            z-index: 2; /* Ensure the title is above the overlay */
-        }}
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-
-    # Create the background container with an overlaid title
-    st.markdown(
-        """
-        <div class="bg-container">
-            <div class="overlay-title">Overview</div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
+    load_background_image()
     breaks(2)
     st.write("This app compares the performance of different machine learning algorithms.")
     breaks(1)
+
+    # Logging
     logger, log_stream = configure_logging()  # Get logger and log stream
     logging_level = st.selectbox("Select logging level", ['INFO', 'DEBUG', 'WARNING'])
     toggle_logging(logging_level, logger)
     breaks(2)   
     
-    # Step 1: Upload file
+    # Upload file
     st.write("Upload your data or experiment with one of the datasets provided:")
     df = upload_files()
     breaks(2)
 
-    # display dataset images
+    # Display dataset images
     if "selected_image" not in st.session_state:
         st.session_state.selected_image = None
     initialize_session_state()

@@ -3,7 +3,7 @@ import streamlit as st
 
 def select_target(df):
     st.markdown("<h5 style='text-align:left;'>Target Variable:</h5>", unsafe_allow_html=True)
-    target = st.selectbox("", df.columns)
+    target = st.selectbox("", df.columns,label_visibility="collapsed")
     target_type = df[target].dtypes
 
     return target, target_type

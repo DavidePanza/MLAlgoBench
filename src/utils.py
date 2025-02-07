@@ -25,7 +25,7 @@ def get_base64_encoded_image(image_path):
         return base64.b64encode(img_file.read()).decode()
 
 def load_background_image():
-    image_path = "./images/background4.jpeg"  # Replace with your actual image path
+    image_path = "../images/background4.jpeg"  # Replace with your actual image path
     base64_image = get_base64_encoded_image(image_path)
     # Inject CSS for the background and title overlay
     st.markdown(

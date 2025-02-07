@@ -3,17 +3,16 @@ import pandas as pd
 import os
 import numpy as np
 import base64
-import plotly.graph_objects as go
-from src.preprocessing import *
-from src.data_tests import *
-from src.feat_selection import *
-from src.pipeline import *
-from src.logging import *
-from src.models import *
-from src.train_test import *
-from src.datasets import *
-from src.utils import *
-from src.plots import *
+from preprocessing import *
+from data_tests import *
+from feat_selection import *
+from mypipeline import *
+from mylogging import *
+from models import *
+from train_test import *
+from datasets import *
+from utils import *
+from plots import *
 
 
 def reset_session_state():
@@ -76,7 +75,7 @@ def main():
     df = df.drop_duplicates()
 
     # Target Selection
-    with st.container(height = 800):
+    with st.container(height = 700):
         breaks(1)
         st.markdown("<h3 style='text-align: left;padding-left: 30px;'>Target and Features Selection</h3><br>",unsafe_allow_html=True)
         
@@ -113,25 +112,31 @@ def main():
         st.markdown("<h3 style='text-align: left;padding-left: 30px;'>Data Preprocessing</h3><br>", unsafe_allow_html=True)
         _, col_p2, _, col_p4, _ = st.columns([.1, 1, .4, 1, .1])
         with col_p2:
-            choice_missing = st.radio("Do you want to drop columns with missing values?", ("Yes", "No"))
-            if choice_missing == "Yes":
+            drop_cols_missing= st.radio("Do you want to drop columns with missing values?", ("Yes", "No"),  index=1)
+            st.session_state["drop_cols_missing"] = drop_cols_missing
+            if st.session_state["drop_cols_missing"] == "Yes":
                 breaks(1)
-                na_threshold = st.slider("Select threshold of missing values to drop variables", 0, 100, 20)
+                missing_threshold = st.slider("Select threshold of missing values to drop variables", 0, 100, 20)
         with col_p4:
-            choice_missing = st.radio("Do you want to drop outliers?", ("Yes", "No"))
-            if choice_missing == "Yes": 
+            drop_cols_outliers = st.radio("Do you want to drop outliers?", ("Yes", "No"), index=1)
+            st.session_state["drop_cols_outliers"] = drop_cols_outliers
+            if st.session_state["drop_cols_outliers"] == "Yes": 
                 breaks(1)
                 outliers_threshold = st.slider("Select z-threshold to drop outliers", 0, 6, 3)
 
         # Drop cols with missing values
-        df, cols_to_drop = process_missing_values(df, selected_numeric, selected_categorical, logger, na_threshold)
-        logger.info(f"Columns dropped due to missing values: {', '.join(cols_to_drop)}")
+        if st.session_state["drop_cols_missing"] == "Yes":
+            df, cols_to_drop = process_missing_values(df, selected_numeric, selected_categorical, logger, missing_threshold)
+            selected_numeric = [col for col in selected_numeric if col not in cols_to_drop]
+            selected_categorical = [col for col in selected_categorical if col not in cols_to_drop]
+            logger.info(f"Columns dropped due to missing values: {', '.join(cols_to_drop)}")
         
         # Drop outliers
-        df = process_outliers(df, target, outliers_threshold)
-        logger.info(f"Remaining columns after drop: {' '.join(df.columns)}")
-        logger.info(f"Target: {target}")
-        logger.info(f"--> Columns in df: {' '.join(df.columns)}")
+        if st.session_state["drop_cols_outliers"] == "Yes":
+            df = process_outliers(df, target, outliers_threshold)
+            logger.info(f"Remaining columns after drop: {' '.join(df.columns)}")
+            logger.info(f"Target: {target}")
+            logger.info(f"--> Columns in df: {' '.join(df.columns)}")
 
         # Drop NAs in target
         df = remove_target_na(df, target)
@@ -139,35 +144,36 @@ def main():
 
         # Data Preprocessing 2 - Normality Test - Cardinality  
         # Normality Test
-        selected_numeric = [col for col in selected_numeric if col not in cols_to_drop]
+        #selected_numeric = [col for col in selected_numeric if col not in cols_to_drop]
         normal_cols, not_normal_cols = run_shapiro_test(df, selected_numeric)
         logger.info(f"\n\t--Shapiro Test Results:")
         logger.info(f"Normal variables: {' '.join(normal_cols)}")
         logger.info(f"Not normal variables: {' '.join(not_normal_cols)}")
 
         # Cardinality
-        selected_categorical = [col for col in selected_categorical if col not in cols_to_drop]
+        #selected_categorical = [col for col in selected_categorical if col not in cols_to_drop]
         high_cardinality, low_cardinality = check_cardinality(df, selected_categorical)
         logger.info(f"\n\t--Cardinality Check Results:")
         logger.info(f"High cardinality variables: {' '.join(high_cardinality)}")
         logger.info(f"Low cardinality variables: {' '.join(low_cardinality)}")
 
-        breaks(1)
-        if st.button("Apply Preprocessing"):
-            st.session_state["numeric_for_test"] = selected_numeric
-            st.session_state["categorical_for_test"] = selected_categorical
-            st.session_state["normal_distributed"] = normal_cols
-            st.session_state["not_normal_distributed"] = not_normal_cols
-            st.session_state["high_cardinality"] = high_cardinality
-            st.session_state["low_cardinality"] = low_cardinality
-            st.session_state["preprocessed"] = True
+    breaks(1)
+    if st.button("Apply Preprocessing"):
+        st.session_state["numeric_for_test"] = selected_numeric
+        st.session_state["categorical_for_test"] = selected_categorical
+        st.session_state["normal_distributed"] = normal_cols
+        st.session_state["not_normal_distributed"] = not_normal_cols
+        st.session_state["high_cardinality"] = high_cardinality
+        st.session_state["low_cardinality"] = low_cardinality
+        st.session_state["preprocessed"] = True
+    breaks(1)
 
     if st.session_state.get("preprocessed", False):
         logger.info("\n\n------Model Selection\n")
 
         # Select Models
         breaks(1)
-        with st.container(height = 430):
+        with st.container(height = 400):
             breaks(1)
             st.markdown("<h3 style='text-align: left;padding-left: 30px;'>Training Configuration</h3><br>", unsafe_allow_html=True)    
             if target_type == 'object':
@@ -197,13 +203,14 @@ def main():
             logger.info(f"N° cols in test: {y_train.to_frame().columns}")
             logger.info(f"train size: {X_train.shape[0]}, test_size:{X_test.shape[0]}")
             
+        breaks(1)
+        if st.button("Train Models"):
+            results_df, metrics_name = train_models(models_pipelines, X_train, X_test, y_train, y_test, st.session_state.target_type)
+            st.session_state["metrics_name"] = metrics_name
+            st.session_state["results_df"] = results_df
+            st.session_state["model trained"] = True
+            #st.dataframe(results_df)
             breaks(1)
-            if st.button("Train Models"):
-                results_df, metrics_name = train_models(models_pipelines, X_train, X_test, y_train, y_test, st.session_state.target_type)
-                st.session_state["metrics_name"] = metrics_name
-                st.session_state["results_df"] = results_df
-                st.session_state["model trained"] = True
-                #st.dataframe(results_df)
 
     # Results visualization
     if st.session_state.get("preprocessed", False) and st.session_state.get("model trained", False):

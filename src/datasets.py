@@ -25,9 +25,9 @@ def initialize_images():
     script_dir = os.path.dirname(os.path.abspath(__file__))
 
     # Construct the relative paths to the image folder.
-    image1_path = os.path.join(script_dir, "..", "image", "wine.jpeg")
-    image2_path = os.path.join(script_dir, "..", "image", "titanic.jpeg")
-    image3_path = os.path.join(script_dir, "..", "image", "iris.jpeg")
+    image1_path = os.path.join(script_dir, "..", "images", "wine.jpeg")
+    image2_path = os.path.join(script_dir, "..", "images", "titanic.jpeg")
+    image3_path = os.path.join(script_dir, "..", "images", "iris.jpeg")
 
     # Define images and their corresponding CSV download URLs.
     images = [
@@ -79,27 +79,54 @@ def display_images(images):
                     unsafe_allow_html=True,
                 )
 
-
-
-
 def download_dataset():
+    df = None  # Initialize df
     images = initialize_images()
     if st.session_state.get("selected_image") is not None:
         selected_index = st.session_state.selected_image
         title, img_path, csv_url = images[selected_index]
         
-        # If not already loaded, fetch and store the CSV as a DataFrame.
+        # Check if the session state DataFrame is already set.
         if st.session_state.df is None:
             response = requests.get(csv_url)
             if response.status_code == 200:
                 df = pd.read_csv(csv_url)
-                st.session_state.df = df
+                st.session_state.df = df  # Save it to session state
             else:
                 st.error("Failed to download CSV data.")
-        
+        else:
+            None
+            # If there's already data, use it.
+            #df = st.session_state.df
+
         # Display the DataFrame if available.
-        if st.session_state.df is not None:
+        if df is not None:
             st.write(f"### Data from {title}")
-            st.dataframe(st.session_state.df)
+            st.dataframe(df)
+    
+    return st.session_state.df
+
+
+
+# def download_dataset():
+#     images = initialize_images()
+#     if st.session_state.get("selected_image") is not None:
+#         selected_index = st.session_state.selected_image
+#         title, img_path, csv_url = images[selected_index]
         
-        return df
+#         # Always download the dataset freshly.
+#         response = requests.get(csv_url)
+#         if response.status_code == 200:
+#             df = pd.read_csv(csv_url)
+#         else:
+#             st.error("Failed to download CSV data.")
+#             return None
+        
+#         st.write(f"### Data from {title}")
+#         st.dataframe(df)
+        
+#         # Return the freshly downloaded DataFrame.
+#         return df
+    
+#     return None
+

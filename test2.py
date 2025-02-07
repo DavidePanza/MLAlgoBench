@@ -29,20 +29,7 @@ def upload_files():
         st.write("Uploaded file loaded.")
         return df
     else:
-        reset_session_state()
         return None
-
-
-# def upload_files():
-#     """Upload a CSV file and return it as a DataFrame."""
-#     uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
-    
-#     # If no file is uploaded, reset everything
-#     if uploaded_file is None:
-#         reset_session_state()
-#         return None
-    
-#     return pd.read_csv(uploaded_file)  # Read and return the DataFrame
 
 def main():
     # Configure page
@@ -91,6 +78,7 @@ def main():
     st.markdown("<br><h3> - Select Features:</h3>", unsafe_allow_html=True)
     numeric_feat, categorical_feat = return_feat(df, target)
     selected_numeric, selected_categorical = select_vars(numeric_feat, categorical_feat)
+    st.write(selected_numeric, selected_categorical)
     df = drop_columns(df, selected_numeric, selected_categorical, target)
 
     logger.info(f"Numeric features: {' '.join(numeric_feat)}")

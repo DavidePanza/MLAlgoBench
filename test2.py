@@ -171,13 +171,7 @@ def main():
         models_pipelines = create_model_pipelines(filtered_models, st.session_state.normal_distributed, 
                                                 st.session_state.not_normal_distributed, st.session_state.low_cardinality, st.session_state.high_cardinality)
         logger.info(f"models pipelines: {models_pipelines.items()}")
-
         breaks(2)
-        if st.button("Select Models"):
-            st.session_state["selected_models"] = selected_models
-            st.session_state["model selected"] = True
-
-    if st.session_state.get("feature selection", False) and st.session_state.get("preprocessed", False) and st.session_state.get("model selected", False):
 
         # Train and evaluate models
         separation()
@@ -194,31 +188,18 @@ def main():
         if st.button("Train Models"):
             results_df, metrics_name = train_models(models_pipelines, X_train, X_test, y_train, y_test, st.session_state.target_type)
             st.session_state["metrics_name"] = metrics_name
+            st.session_state["results_df"] = results_df
             st.session_state["model trained"] = True
             st.dataframe(results_df)
 
     # Results visualization
     if (st.session_state.get("feature selection", False) and st.session_state.get("preprocessed", False) 
-        and st.session_state.get("model selected", False) and st.session_state.get("model trained", False)):
+        and st.session_state.get("model trained", False)):
         separation()
         st.markdown("<h1 style='text-align: center;'>Results</h1><br>", unsafe_allow_html=True)
         metric = st.selectbox("Select Metric", st.session_state.metrics_name)
-        #plot_results(results_df, metrics)
-
-        fig = go.Figure([go.Bar(x=results_df[metric], y=results_df["Model"], orientation='h')])
-        fig.update_layout(
-        title=f"{metric}",
-                xaxis_title="Year",
-                yaxis=dict(title="Models"),
-                yaxis2=dict(
-                    title="Model",
-                    overlaying="y",
-                    side="right",
-                    showgrid=False
-                ),
-                legend=dict(x=0.1, y=1.1)
-                )
-        st.plotly_chart(fig, use_container_width=True)
+        breaks(1)
+        plot_results(st.session_state.results_df,  metric)
 
     # Display logs
     display_logs(log_stream)

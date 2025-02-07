@@ -3,6 +3,7 @@ import pandas as pd
 import os
 import numpy as np
 import base64
+import plotly.graph_objects as go
 from src.preprocessing import *
 from src.tests import *
 from src.feat_selection import *
@@ -12,6 +13,7 @@ from src.models import *
 from src.train_test import *
 from src.datasets import *
 from src.utils import *
+from src.plots import *
 
 
 def reset_session_state():
@@ -66,8 +68,11 @@ def main():
     else:
         st.stop()  # Stop execution if no data is uploaded
 
-    # Step 2: Feature selection
+    # Feature selection
     logger.info("------Starting feature selection process...\n")
+
+    # Drop duplicates
+    df = df.drop_duplicates()
 
     # Target Selection
     st.markdown("<h1 style='text-align: center;'>Target and Features Selection</h1><br><br>",unsafe_allow_html=True)
@@ -78,7 +83,6 @@ def main():
     st.markdown("<br><h3> - Select Features:</h3>", unsafe_allow_html=True)
     numeric_feat, categorical_feat = return_feat(df, target)
     selected_numeric, selected_categorical = select_vars(numeric_feat, categorical_feat)
-    st.write(selected_numeric, selected_categorical)
     df = drop_columns(df, selected_numeric, selected_categorical, target)
 
     logger.info(f"Numeric features: {' '.join(numeric_feat)}")
@@ -86,6 +90,7 @@ def main():
     logger.info(f"Selected numeric features: {' '.join(selected_numeric)}")
     logger.info(f"Selected categorical features: {' '.join(selected_categorical)}")
     logger.info(f"--> Columns in df: {' '.join(df.columns)}")
+    logger.info(f"--> Rows in df: {df.shape[0]}")
 
     # Button to apply preprocessing
     breaks(2)
@@ -115,9 +120,6 @@ def main():
         
         # Drop outliers
         df = process_outliers(df, target, outliers_threshold)
-
-        # Drop duplicates
-        df = df.drop_duplicates()
         logger.info(f"Remaining columns after drop: {' '.join(df.columns)}")
         logger.info(f"Target: {target}")
         logger.info(f"--> Columns in df: {' '.join(df.columns)}")
@@ -174,9 +176,6 @@ def main():
         if st.button("Select Models"):
             st.session_state["selected_models"] = selected_models
             st.session_state["model selected"] = True
-        
-        # Display logs
-        display_logs(log_stream)
 
     if st.session_state.get("feature selection", False) and st.session_state.get("preprocessed", False) and st.session_state.get("model selected", False):
 
@@ -193,8 +192,33 @@ def main():
         
         breaks(2)
         if st.button("Train Models"):
-            results_df = train_models(models_pipelines, X_train, X_test, y_train, y_test, st.session_state.target_type)
-            st.write(results_df)
+            results_df, metrics_name = train_models(models_pipelines, X_train, X_test, y_train, y_test, st.session_state.target_type)
+            st.session_state["metrics_name"] = metrics_name
+            st.session_state["model trained"] = True
+            st.dataframe(results_df)
+
+    # Results visualization
+    if (st.session_state.get("feature selection", False) and st.session_state.get("preprocessed", False) 
+        and st.session_state.get("model selected", False) and st.session_state.get("model trained", False)):
+        separation()
+        st.markdown("<h1 style='text-align: center;'>Results</h1><br>", unsafe_allow_html=True)
+        metric = st.selectbox("Select Metric", st.session_state.metrics_name)
+        #plot_results(results_df, metrics)
+
+        fig = go.Figure([go.Bar(x=results_df[metric], y=results_df["Model"], orientation='h')])
+        fig.update_layout(
+        title=f"{metric}",
+                xaxis_title="Year",
+                yaxis=dict(title="Models"),
+                yaxis2=dict(
+                    title="Model",
+                    overlaying="y",
+                    side="right",
+                    showgrid=False
+                ),
+                legend=dict(x=0.1, y=1.1)
+                )
+        st.plotly_chart(fig, use_container_width=True)
 
     # Display logs
     display_logs(log_stream)

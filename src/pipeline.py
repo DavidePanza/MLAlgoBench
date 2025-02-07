@@ -33,7 +33,7 @@ def create_preprocessing_pipeline(numeric_normal_features = [], numeric_not_norm
     if categorical_binary:
         transformers.append(('cat_baseN', Pipeline([
             ('imputer', SimpleImputer(strategy='most_frequent')),  
-            ('encoder', ce.BinaryEncoder(cols=categorical_binary)) 
+            ('encoder', ce.BinaryEncoder()) 
         ]), categorical_binary))
 
     # Combine only the valid transformers

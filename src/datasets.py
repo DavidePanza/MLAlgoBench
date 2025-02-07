@@ -31,8 +31,8 @@ def initialize_images():
 
     # Define images and their corresponding CSV download URLs.
     images = [
-        ("Wine Datset", image1_path, "https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv"),
-        ("Titanic Dataset", image2_path, "https://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-red.csv"),
+        ("Wine Datset", image1_path, "https://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-red.csv"),
+        ("Titanic Dataset", image2_path, "https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv"),
         ("Iris Dataset", image3_path, "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv"), 
     ]
     return images
@@ -79,7 +79,7 @@ def display_images(images):
                     unsafe_allow_html=True,
                 )
 
-def download_dataset():
+def download_dataset(show_data=False):
     df = None  # Initialize df
     images = initialize_images()
     if st.session_state.get("selected_image") is not None:
@@ -100,33 +100,10 @@ def download_dataset():
             #df = st.session_state.df
 
         # Display the DataFrame if available.
-        if df is not None:
+        if df is not None and show_data:
             st.write(f"### Data from {title}")
             st.dataframe(df)
     
     return st.session_state.df
 
-
-
-# def download_dataset():
-#     images = initialize_images()
-#     if st.session_state.get("selected_image") is not None:
-#         selected_index = st.session_state.selected_image
-#         title, img_path, csv_url = images[selected_index]
-        
-#         # Always download the dataset freshly.
-#         response = requests.get(csv_url)
-#         if response.status_code == 200:
-#             df = pd.read_csv(csv_url)
-#         else:
-#             st.error("Failed to download CSV data.")
-#             return None
-        
-#         st.write(f"### Data from {title}")
-#         st.dataframe(df)
-        
-#         # Return the freshly downloaded DataFrame.
-#         return df
-    
-#     return None
 

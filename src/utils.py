@@ -4,7 +4,7 @@ import base64
 def configure_page() -> None:
     # metadata
     st.set_page_config(page_title="ML Algo Benchmarker", layout="wide")
-    
+
 def separation():
     st.write("\n")
     st.markdown("---")

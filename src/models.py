@@ -47,11 +47,8 @@ def get_regression_models():
 
 def model_selection(models):
     """Checkbox selection for models in a single column using list comprehension."""
-    
-    # Displaying models in a single column
-    st.markdown("<h4 style='text-align:left;'>Model Selection</h4>", unsafe_allow_html=True)
-
     # Use list comprehension to select models
-    selected_models = [model for model in models if st.checkbox(model, key=f"model_{model}")]
+    selected_models = st.multiselect("Select models", options=models, default=models)
+    #selected_models = [model for model in models if st.checkbox(model, key=f"model_{model}")]
 
     return selected_models

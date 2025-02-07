@@ -8,7 +8,7 @@ def adjusted_r2(r2, n, p):
     """Calculate Adjusted R²."""
     return 1 - ((1 - r2) * (n - 1) / (n - p - 1))
 
-def prepare_data(df, target, test_threshold):
+def prepare_data(df, target, test_threshold, verbose=False):
     
     # Features & Target
     y = df.loc[:,target]
@@ -17,9 +17,10 @@ def prepare_data(df, target, test_threshold):
     # Split data
     test_threshold = test_threshold / 100
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_threshold, random_state=42)
-    st.write('X_train:', X_train.columns)
-    st.write('y_train:', y_train.name)
-    st.write('X_test:', X_test.columns)
+    if verbose:
+        st.write('X_train:', X_train.columns)
+        st.write('y_train:', y_train.name)
+        st.write('X_test:', X_test.columns)
 
     return X_train, X_test, y_train, y_test
 
@@ -47,6 +48,7 @@ def train_models(pipelines, X_train, X_test, y_train, y_test, target_type):
                 "Precision": precision_score(y_test, y_pred, average="weighted"),
                 "Recall": recall_score(y_test, y_pred, average="weighted")
             }
+            metrics_name = ["Accuracy", "F1-Score", "Precision", "Recall"]
         else:  # Regression
             metrics = {
                 "Model": model_name,
@@ -55,10 +57,11 @@ def train_models(pipelines, X_train, X_test, y_train, y_test, target_type):
                 "R2 Score": r2_score(y_test, y_pred),
                 "Adjusted R2": adjusted_r2(r2_score(y_test, y_pred), X_test.shape[0], X_test.shape[1])
             }
+            metrics_name = ["Mean Squared Error", "Mean Absolute Error", "R2 Score", "Adjusted R2"]
 
         results.append(metrics)
 
     # Convert results list into a DataFrame
     results_df = pd.DataFrame(results)
 
-    return results_df
+    return results_df, metrics_name

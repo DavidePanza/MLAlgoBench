@@ -1,8 +1,71 @@
 import streamlit as st
 import plotly.graph_objects as go
 import pandas as pd
+import numpy as np
 
+def plot_histograms(df, cols_x_row=4, bins=20):
+    """
+    Visualizes the distribution of each feature in a DataFrame using histograms.
+    """
+    cols = st.columns(cols_x_row)
+    
+    for idx, feature in enumerate(df.columns):
+        # Create histogram for the current feature
+        fig = go.Figure()
+        fig.add_trace(go.Histogram(x=df[feature], nbinsx=bins))
+        
+        # Set x-axis label only for the first plot in each row
+        if idx % cols_x_row == 0:
+            y_label = feature
+        else:
+            y_label = "" 
 
+        fig.update_layout(
+            title_text=f"{feature}",
+            title_x=0.5,  # Centers the title
+            title_font=dict(size=24), 
+            yaxis_title_text=y_label,
+            bargap=0.05,
+            template="plotly_white"
+        )
+        
+        # Use modulus to determine column index in the current row
+        cols[idx % cols_x_row].plotly_chart(fig, use_container_width=True)
+        
+        # Every 4 histograms, create a new row of columns (except after the last iteration)
+        if (idx + 1) % cols_x_row == 0 and (idx + 1) < len(df.columns):
+            cols = st.columns(cols_x_row)
+
+def plot_correlation_matrix(df,zmin=-1,zmax=1):
+    """
+    Visualizes the correlation matrix of a DataFrame using a heatmap.
+    """
+    # Calculate correlation matrix
+    corr = df.corr()
+
+    # Create heatmap with correlation numbers on each cell
+    fig = go.Figure()
+    fig.add_trace(go.Heatmap(
+        z=corr.values,
+        x=corr.columns,
+        y=corr.columns,
+        text=np.around(corr.values, decimals=2),   # Round correlation values
+        texttemplate="%{text}",                     # Display text in each cell
+        colorscale="Viridis",                       # Use a purple-ish colorscale
+        zmin=zmin,                                    # Set the minimum correlation value for contrast
+        zmax=zmax,                                     # Set the maximum correlation value for contrast
+        colorbar=dict(title="Correlation")
+    ))
+
+    # Update layout
+    fig.update_layout(
+        title_text="Correlation Matrix",
+        title_x=0.4,  # Centers the title (adjust if needed)
+        title_font=dict(size=24),
+        template="plotly_white"
+    )
+    fig.update_yaxes(autorange='reversed')
+    st.plotly_chart(fig, use_container_width=True)
 
 def plot_results(results_df, metric, x_limits=None):
     """

@@ -5,6 +5,10 @@ def configure_page() -> None:
     # metadata
     st.set_page_config(page_title="ML Algo Benchmarker", layout="wide")
 
+def reset_session_state():
+    """Resets all session state variables."""
+    st.session_state.clear()  # Clears everything
+
 def separation():
     st.write("\n")
     st.markdown("---")

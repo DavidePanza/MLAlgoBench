@@ -3,6 +3,7 @@ import pandas as pd
 import os
 import numpy as np
 import base64
+from data_loader import upload_files
 from preprocessing import *
 from data_tests import *
 from feat_selection import *
@@ -13,23 +14,6 @@ from train_test import *
 from datasets import *
 from utils import *
 from plots import *
-
-
-def reset_session_state():
-    """Resets all session state variables."""
-    st.session_state.clear()  # Clears everything
-
-def upload_files():
-    uploaded_file = st.file_uploader("Choose a file")
-    if uploaded_file is not None:
-        # Read the uploaded CSV file
-        df = pd.read_csv(uploaded_file)
-        # Overwrite the session state DataFrame
-        st.session_state.df = df  
-        st.session_state.data_source = "upload"  # (optional) tag the source if needed
-        return df
-    else:
-        return None
 
 def main():
     # Configure page
@@ -66,9 +50,9 @@ def main():
             logger.info(f"Data loaded: {df.shape[0]} rows and {df.shape[1]} columns\n")
         else:
             st.stop()  # Stop execution if no data is uploaded
-
     breaks(1)
-    # Feature selection
+
+    # ---- Feature selection ----
     logger.info("------Starting feature selection process...\n")
 
     # Drop duplicates
@@ -88,18 +72,22 @@ def main():
             # Display correlation matrix
             if df.select_dtypes(include=['number']).shape[1] > 1:
                 breaks(1)
-                _, col_corr1, _, col_corr2, _, = st.columns([.15,.4, .1, 1.6, .6])
+                if df.select_dtypes(include=['number']).shape[1] > 10:
+                    matrix_size = 2.4
+                else:
+                    matrix_size = 1.6
+                _, col_corr1, _, col_corr2, _, = st.columns([.15,.4, .1, matrix_size, .6])
                 with col_corr1:
                     breaks(3)
                     zmin = st.number_input("Min value for correlation matrix:", min_value=-1, max_value=1, value=-1)
                     zmax = st.number_input("Max value for correlation matrix:", min_value=-1, max_value=1, value=1)
                 with col_corr2:
                     plot_correlation_matrix(df.select_dtypes(include=['number']),zmin,zmax)
-
     breaks(1)
 
     # Target Selection
-    with st.container(height = 700):
+    feat_container_height = 450 if df.columns.shape[0] > 10 else 350
+    with st.container(height = feat_container_height):
         breaks(1)
         st.markdown("<h3 style='text-align: left;padding-left: 30px;'>Target and Features Selection</h3><br>",unsafe_allow_html=True)
         
@@ -129,10 +117,13 @@ def main():
         st.session_state["selected_numeric"] = selected_numeric
         st.session_state["selected_categorical"] = selected_categorical
 
-        # ---- Data Preprocessing Start ----
+    with st.container(height = 400):
+        
+        # ---- Data Preprocessing ----
         logger.info("\n\n------Starting data preprocessing process\n")
 
         # Data Preprocessing 1 - Missing Values and Outliers
+        breaks(1)
         st.markdown("<h3 style='text-align: left;padding-left: 30px;'>Data Preprocessing</h3><br>", unsafe_allow_html=True)
         _, col_p2, _, col_p4, _ = st.columns([.1, 1, .4, 1, .1])
         with col_p2:
@@ -247,6 +238,6 @@ def main():
     display_logs(log_stream)
 
 
-
 if __name__ == "__main__":
     main()
+

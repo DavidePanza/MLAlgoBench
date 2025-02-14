@@ -90,7 +90,10 @@ def download_dataset(show_data=False):
         if st.session_state.df is None:
             response = requests.get(csv_url)
             if response.status_code == 200:
-                df = pd.read_csv(csv_url)
+                if csv_url == "https://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-red.csv":
+                    df = pd.read_csv(csv_url, sep=";")
+                else:
+                    df = pd.read_csv(csv_url)
                 st.session_state.df = df  # Save it to session state
             else:
                 st.error("Failed to download CSV data.")

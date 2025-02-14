@@ -20,12 +20,22 @@ def plot_histograms(df, cols_x_row=4, bins=20):
         else:
             y_label = "" 
 
-        fig.update_layout(
+        fig.update_layout(yaxis=dict(
+            tickfont=dict(size=14),  # Increase x-axis tick size
+            showgrid=True,  # Enable grid lines
+            gridcolor="lightgray",  # Lighter grid color
+            gridwidth=0,  # Thin grid lines
+            griddash="dot"  # Make the grid lines dotted
+        ),  
+            xaxis=dict(
+            tickfont=dict(size=14),
+            #tickangle=45
+        ),
             title_text=f"{feature}",
-            title_x=0.5,  # Centers the title
+            title_x=0.3,  # Centers the title
             title_font=dict(size=24), 
             yaxis_title_text=y_label,
-            bargap=0.05,
+            bargap=0.05,  
             template="plotly_white"
         )
         
@@ -62,7 +72,8 @@ def plot_correlation_matrix(df,zmin=-1,zmax=1):
         title_text="Correlation Matrix",
         title_x=0.4,  # Centers the title (adjust if needed)
         title_font=dict(size=24),
-        template="plotly_white"
+        template="plotly_white",
+        height=600,
     )
     fig.update_yaxes(autorange='reversed')
     st.plotly_chart(fig, use_container_width=True)
@@ -175,11 +186,11 @@ def plot_results(results_df, metric, x_limits=None):
             griddash="dot"  # Make the grid lines dotted
         ),
         yaxis=dict(
-            title=dict(text="Models", font=dict(size=26)),  # Bigger y-axis title
-            tickfont=dict(size=14),  # Increase y-axis tick size
-            autorange="reversed"  # Keeps best models on top
+            title=dict(text="Models", font=dict(size=26)),  
+            tickfont=dict(size=14),  
+            autorange="reversed"  
         ),
-        bargap=0.3,  # Space between bars
+        bargap=0.3,  
         margin=dict(l=120, r=20, t=50, b=50),
         template="plotly_white"
     )

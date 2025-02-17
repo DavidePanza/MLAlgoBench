@@ -4,7 +4,9 @@ import numpy as np
 from scipy.stats import zscore
 
 def process_missing_values(df, selected_numeric, selected_categorical, logger, treshold = .2):
-    # drop columns with missing values
+    """ 
+    drop columns with missing values
+    """
     cols_to_drop = []
     df_selected = df[selected_numeric + selected_categorical]
 
@@ -20,40 +22,39 @@ def process_missing_values(df, selected_numeric, selected_categorical, logger, t
     return df.drop(columns=cols_to_drop), cols_to_drop
 
 def process_outliers(df, target, threshold=2):
+    """
+    Remove rows from a DataFrame where the z-score of the target column is above a threshold.
+    """
+    # Process a single column
     if isinstance(df, pd.Series):
-        # Compute the z-score for the Series
         z_scores = zscore(df)
-        # Find indices where the absolute z-score is greater than the threshold
         outlier_idx = df.index[np.abs(z_scores) > threshold]
         return df.drop(outlier_idx)
 
+    # Process multiple columns
     elif isinstance(df, pd.DataFrame):
-        # Select only numeric columns
         num_cols = df.select_dtypes(include='number')
-        # If a target column is provided and exists, drop it from the columns to check.
         if target is not None and target in num_cols.columns:
             num_cols = num_cols.drop(columns=[target], errors='ignore')
         
-        # Compute z-scores for each numeric column and force the result to be a DataFrame.
-        # This ensures that even with a single column, z_scores_df is a DataFrame.
+        # Calculate z-scores for each numeric column
         z_scores_df = pd.DataFrame(
             {col: zscore(num_cols[col]) for col in num_cols.columns},
             index=num_cols.index
         )
         
-        # Create a boolean mask: True where the absolute z-score is above threshold
         outlier_mask = np.abs(z_scores_df) > threshold
-        
-        # Identify rows where any numeric column is an outlier
         rows_to_remove = df.index[outlier_mask.any(axis=1)]
-        
-        # Drop those rows from the original DataFrame
+
+        # Remove rows with outliers
         return df.drop(rows_to_remove)
-    
     else:
         raise ValueError("Input must be a Pandas DataFrame or Series")
 
 def remove_target_na(df, target):
+    """
+    Remove rows from a DataFrame where the target column has missing values.
+    """
     df = df.dropna(subset=[target])
 
     return df

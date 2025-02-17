@@ -9,8 +9,9 @@ def adjusted_r2(r2, n, p):
     return 1 - ((1 - r2) * (n - 1) / (n - p - 1))
 
 def prepare_data(df, target, test_threshold, verbose=False):
-    
-    # Features & Target
+    """
+    Prepare the data for training and testing.
+    """
     y = df.loc[:,target]
     X = df.drop(columns=[target])
 
@@ -33,14 +34,12 @@ def train_models(pipelines, X_train, X_test, y_train, y_test, target_type):
     for model_name, pipeline in pipelines.items():
         print(f"Training model: {model_name}")
 
-        # Train the pipeline
+        # Train and predict
         pipeline.fit(X_train, y_train)
-
-        # Predictions
         y_pred = pipeline.predict(X_test)
 
         # Collect performance metrics
-        if target_type == 'object':  # Classification
+        if target_type == 'object':  
             metrics = {
                 "Model": model_name,
                 "Accuracy": accuracy_score(y_test, y_pred),
@@ -49,7 +48,7 @@ def train_models(pipelines, X_train, X_test, y_train, y_test, target_type):
                 "Recall": recall_score(y_test, y_pred, average="weighted")
             }
             metrics_name = ["Accuracy", "F1-Score", "Precision", "Recall"]
-        else:  # Regression
+        else:  
             metrics = {
                 "Model": model_name,
                 "Mean Squared Error": mean_squared_error(y_test, y_pred),
@@ -60,8 +59,6 @@ def train_models(pipelines, X_train, X_test, y_train, y_test, target_type):
             metrics_name = ["Mean Squared Error", "Mean Absolute Error", "R2 Score", "Adjusted R2"]
 
         results.append(metrics)
-
-    # Convert results list into a DataFrame
     results_df = pd.DataFrame(results)
 
     return results_df, metrics_name

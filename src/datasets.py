@@ -4,9 +4,10 @@ import requests
 import pandas as pd
 import os
 
-
-
 def initialize_session_state():
+    """
+    Initialize session state variables.
+    """
     params = st.query_params
     if "selected" in params:
         try:
@@ -15,16 +16,16 @@ def initialize_session_state():
             # Only update if different from the current selection
             if st.session_state.get("selected_image") != selected:
                 st.session_state.selected_image = selected
-                st.session_state.df = None  # Reset df to load new data.
+                st.session_state.df = None  
         except ValueError:
             pass  
 
-
 def initialize_images():
-    # Get the current script directory.
+    """
+    Initialize images for the predefined datasets and their corresponding CSV download URLs.
+    """
+    # Get the directory of the current script and define the paths to the images.
     script_dir = os.path.dirname(os.path.abspath(__file__))
-
-    # Construct the relative paths to the image folder.
     image1_path = os.path.join(script_dir, "..", "images", "wine.jpeg")
     image2_path = os.path.join(script_dir, "..", "images", "titanic.jpeg")
     image3_path = os.path.join(script_dir, "..", "images", "iris.jpeg")
@@ -37,20 +38,20 @@ def initialize_images():
     ]
     return images
 
-
 def encode_image(image_path):
-    """Read and encode an image to Base64."""
+    """
+    Read and encode an image to Base64.
+    """
     with open(image_path, "rb") as img_file:
         return base64.b64encode(img_file.read()).decode()
 
-
 def display_images(images):
-    # Create five columns. The first and last columns will be empty, centering the three middle columns.
+    """
+    Display images with titles and links to download the corresponding CSV files.
+    """
     cols = st.columns([1, 1, 1, 1, 1])
 
-    # Loop over the images; use the middle columns (cols[1], cols[2], cols[3]).
     for i, (title, img_path, csv_url) in enumerate(images):
-        # Use cols[i+1] so that for i==0 we use the second column, i==1 uses the third, etc.
         with cols[i + 1]:
             st.markdown(f"<h3 style='text-align: center;'>{title}</h3>", unsafe_allow_html=True)
             if os.path.exists(img_path):
@@ -80,7 +81,10 @@ def display_images(images):
                 )
 
 def download_dataset(show_data=False):
-    df = None  # Initialize df
+    """
+    Download the selected dataset and display its DataFrame.
+    """
+    df = None 
     images = initialize_images()
     if st.session_state.get("selected_image") is not None:
         selected_index = st.session_state.selected_image
@@ -94,15 +98,13 @@ def download_dataset(show_data=False):
                     df = pd.read_csv(csv_url, sep=";")
                 else:
                     df = pd.read_csv(csv_url)
-                st.session_state.df = df  # Save it to session state
+                st.session_state.df = df  
             else:
                 st.error("Failed to download CSV data.")
         else:
             None
-            # If there's already data, use it.
-            #df = st.session_state.df
 
-        # Display the DataFrame if available.
+        # Display the DataFrame if available and show_data is set to True.
         if df is not None and show_data:
             st.write(f"### Data from {title}")
             st.dataframe(df)

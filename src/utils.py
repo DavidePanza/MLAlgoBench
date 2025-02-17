@@ -2,18 +2,28 @@ import streamlit as st
 import base64
 
 def configure_page() -> None:
-    # metadata
+    """
+    Configures the Streamlit page.
+    """
     st.set_page_config(page_title="ML Algo Benchmarker", layout="wide")
 
 def reset_session_state():
-    """Resets all session state variables."""
-    st.session_state.clear()  # Clears everything
+    """
+    Resets all session state variables.
+    """
+    st.session_state.clear()  
 
 def separation():
+    """
+    Creates a separation line.
+    """
     st.write("\n")
     st.markdown("---")
 
 def breaks(n=1):
+    """
+    Creates a line break.
+    """
     if n == 1:
         st.markdown("<br>",unsafe_allow_html=True)
     elif n == 2:
@@ -24,13 +34,19 @@ def breaks(n=1):
         st.markdown("<br><br><br><br>",unsafe_allow_html=True)
 
 def get_base64_encoded_image(image_path):
-    """Reads an image file and encodes it to Base64."""
+    """
+    Reads an image file and encodes it to Base64.
+    """
     with open(image_path, "rb") as img_file:
         return base64.b64encode(img_file.read()).decode()
 
 def load_background_image():
-    image_path = "../images/background4.jpeg"  # Replace with your actual image path
+    """
+    Loads and displays a background image with an overlaid title.
+    """
+    image_path = "../images/background4.jpeg"  
     base64_image = get_base64_encoded_image(image_path)
+    
     # Inject CSS for the background and title overlay
     st.markdown(
         f"""

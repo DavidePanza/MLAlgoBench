@@ -3,6 +3,9 @@ import pandas as pd
 import streamlit as st
 
 def upload_files():
+    """
+    Upload a file and return a DataFrame.
+    """
     uploaded_file = st.file_uploader("Choose a file", type=["csv", "xlsx", "xls"])
     if uploaded_file is not None:
         file_extension = uploaded_file.name.split('.')[-1].lower()
@@ -10,7 +13,7 @@ def upload_files():
         if file_extension == "csv":
             # Read a small sample to guess the delimiter
             sample = uploaded_file.read(1024).decode('utf-8')
-            uploaded_file.seek(0)  # Reset the file pointer after reading the sample
+            uploaded_file.seek(0)  
             
             try:
                 dialect = csv.Sniffer().sniff(sample)

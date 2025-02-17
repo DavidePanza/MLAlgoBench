@@ -7,7 +7,9 @@ import category_encoders as ce
 
 def create_preprocessing_pipeline(numeric_normal_features = [], numeric_not_normal_features = [], categorical_onehot = [], categorical_binary = []):
     transformers = []
-
+    """
+    Create a preprocessing pipeline for numerical and categorical features.
+    """
     # Pipeline for normally distributed numerical features
     if numeric_normal_features:
         transformers.append(('num_norm', Pipeline([

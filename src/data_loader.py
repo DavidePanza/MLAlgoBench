@@ -32,7 +32,7 @@ def upload_files():
             return None
         
         st.session_state.df = df  
-        st.session_state.data_source = "upload"  # (optional) tag the source if needed
+        st.session_state.data_source = "upload"  
         return df
     else:
         return None

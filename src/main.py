@@ -29,24 +29,23 @@ def main():
     toggle_logging(logging_level, logger)
     breaks(2)   
 
-    # Upload file
+    # Upload user file
     with st.container(height=650):
         st.write("Upload your data or experiment with one of the datasets provided:")
         df = upload_files()
         breaks(2)
 
-        # Display dataset images
+        # Display toy dataset images and upload toy datasets
         if "selected_image" not in st.session_state:
             st.session_state.selected_image = None
         initialize_session_state()
         images = initialize_images()
         display_images(images)
         df = download_dataset()
-        #separation()
 
         # If data is loaded, proceed
         if df is not None:
-            st.session_state["data_loaded"] = True  # Mark that data is loaded
+            st.session_state["data_loaded"] = True  
             logger.info(f"Data loaded: {df.shape[0]} rows and {df.shape[1]} columns\n")
         else:
             st.stop()  # Stop execution if no data is uploaded

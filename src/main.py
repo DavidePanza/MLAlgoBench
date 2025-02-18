@@ -57,10 +57,11 @@ def main():
     # Drop duplicates
     df = df.drop_duplicates()
 
-    # Display data histograms
+    # Diata visualization
     if df is not None:
         with st.expander("Visual Data Exploration"):
             breaks(1)
+            # Display data histograms
             col_arg1, _, col_arg2, _, _ = st.columns([1, .1, 1, 1, 1])
             with col_arg1:
                 bins = st.number_input("Number os bins:", min_value=5, max_value=150, value=30)
@@ -96,7 +97,6 @@ def main():
             logger.info(f"Target: {target}")
 
         # Feature Selection
-        #st.markdown("<br><h3> - Select Features:</h3>", unsafe_allow_html=True)
         numeric_feat, categorical_feat = return_feat(df, target)
         selected_numeric, selected_categorical = select_vars(numeric_feat, categorical_feat, col2, col3)
         df = drop_columns(df, selected_numeric, selected_categorical, target)
@@ -121,7 +121,7 @@ def main():
         # ---- Data Preprocessing ----
         logger.info("\n\n------Starting data preprocessing process\n")
 
-        # Data Preprocessing 1 - Missing Values and Outliers
+        # Missing Values and Outliers
         breaks(1)
         st.markdown("<h3 style='text-align: left;padding-left: 30px;'>Data Preprocessing</h3><br>", unsafe_allow_html=True)
         _, col_p2, _, col_p4, _ = st.columns([.1, 1, .4, 1, .1])
@@ -156,7 +156,6 @@ def main():
         df = remove_target_na(df, target)
         logger.info(f"--> Rows in df: {df.shape[0]}")
 
-        # Data Preprocessing 2 - Normality Test - Cardinality  
         # Normality Test
         #selected_numeric = [col for col in selected_numeric if col not in cols_to_drop]
         normal_cols, not_normal_cols = run_shapiro_test(df, selected_numeric)

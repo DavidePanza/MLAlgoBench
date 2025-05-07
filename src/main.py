@@ -196,7 +196,6 @@ def main():
 
             _, col_m2, _, col_m4, _ = st.columns([.1, 1, .4, 1, .1])
             with col_m2:
-                #st.markdown("<h5 style='text-align:left;'>Model Selection</h5>", unsafe_allow_html=True)
                 selected_models = model_selection(models)
             filtered_models = {model_name: model for model_name, model in models.items() if model_name in selected_models}
             logger.info(f"Selected models: {' '.join(selected_models)}")

@@ -1,16 +1,1 @@
-Things to fix:
 
-Load
-- fix semicolon datatypes load DONE
-- add excel types DONE
-
-Visualisation
-- add histograms DONE
-- add confusionmatrix and features importance
-- add correlation of numerical data DONE
-
-Preprocessing
-- add
-
-Bugs
-- fix no df starting bug

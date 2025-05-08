@@ -109,6 +109,9 @@ def download_dataset(show_data=False):
             st.write(f"### Data from {title}")
             st.dataframe(df)
     
-    return st.session_state.df
+        return st.session_state.df
+    
+    else:
+        return None
 
 

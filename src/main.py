@@ -32,7 +32,8 @@ def main():
 
     # Upload user file
     st.markdown("<h3 style='text-align: left;padding-left: 5px;'>1.&nbsp;&nbsp;&nbsp;Data Loading</h3><br>",unsafe_allow_html=True)
-    with st.container(height=600):
+    with st.container(height=700):
+        breaks(1)
         st.write("Upload your data or experiment with one of the datasets provided:")
         df = upload_files()
         breaks(2)

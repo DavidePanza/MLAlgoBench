@@ -91,7 +91,6 @@ def main():
     # Target Selection
     feat_container_height = 450 if df.columns.shape[0] > 10 else 350
     with st.container(height = feat_container_height):
-        breaks(1)
         st.markdown("<h3 style='text-align: left;padding-left: 5px;'>3.&nbsp;&nbsp;&nbsp;Target and Features Selection</h3><br>",unsafe_allow_html=True)
         
         _, col2, col3, col4, _ = st.columns([.2, 1, 1, 1, .2])

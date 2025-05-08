@@ -103,7 +103,7 @@ def load_background_image():
     st.markdown(
         """
         <div class="bg-container">
-            <div class="overlay-title">ML Models Benchmarker</div>
+            <div class="overlay-title">ML-Models Benchmarker</div>
         </div>
         """,
         unsafe_allow_html=True

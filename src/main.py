@@ -31,8 +31,8 @@ def main():
     breaks(2)   
 
     # Upload user file
+    st.markdown("<h3 style='text-align: left;padding-left: 5px;'>1.&nbsp;&nbsp;&nbsp;Data Loading</h3><br>",unsafe_allow_html=True)
     with st.container(height=750):
-        st.markdown("<h3 style='text-align: left;padding-left: 5px;'>1.&nbsp;&nbsp;&nbsp;Data Loading</h3><br>",unsafe_allow_html=True)
         st.write("Upload your data or experiment with one of the datasets provided:")
         df = upload_files()
         breaks(2)
@@ -59,9 +59,9 @@ def main():
     # Drop duplicates
     df = df.drop_duplicates()
 
-    # Diata visualization
+    # Data visualization
     if df is not None:
-        st.markdown("<h3 style='text-align: left;padding-left: 15px;'>2.&nbsp;&nbsp;&nbsp;Visual Data Exploration</h3><br>",unsafe_allow_html=True)
+        st.markdown("<h3 style='text-align: left;padding-left: 5px;'>2.&nbsp;&nbsp;&nbsp;Visual Data Exploration</h3><br>",unsafe_allow_html=True)
         with st.expander("Click here for data visualisation"):
             breaks(1)
             # Display data histograms
@@ -89,10 +89,10 @@ def main():
     breaks(1)
 
     # Target Selection
+    breaks(1)
+    st.markdown("<h3 style='text-align: left;padding-left: 5px;'>3.&nbsp;&nbsp;&nbsp;Target and Features Selection</h3><br>",unsafe_allow_html=True)
     feat_container_height = 450 if df.columns.shape[0] > 10 else 350
     with st.container(height = feat_container_height):
-        st.markdown("<h3 style='text-align: left;padding-left: 5px;'>3.&nbsp;&nbsp;&nbsp;Target and Features Selection</h3><br>",unsafe_allow_html=True)
-        
         _, col2, col3, col4, _ = st.columns([.2, 1, 1, 1, .2])
         with col4:
             target, target_type = select_target(df)
@@ -118,13 +118,14 @@ def main():
         st.session_state["selected_numeric"] = selected_numeric
         st.session_state["selected_categorical"] = selected_categorical
 
+    breaks(1)
+    st.markdown("<h3 style='text-align: left;padding-left: 5px;'>4.&nbsp;&nbsp;&nbsp;Data Preprocessing</h3><br>",unsafe_allow_html=True)
     with st.container(height = 400):
         
         # ---- Data Preprocessing ----
         logger.info("\n\n------Starting data preprocessing process\n")
 
         # Missing Values and Outliers
-        st.markdown("<h3 style='text-align: left;padding-left: 5px;'>4.&nbsp;&nbsp;&nbsp;Data Preprocessing</h3><br>",unsafe_allow_html=True)
         _, col_p2, _, col_p4, _ = st.columns([.1, 1, .4, 1, .1])
         with col_p2:
             drop_cols_missing= st.radio("Do you want to drop columns with missing values?", ("Yes", "No"),  index=1)
@@ -186,8 +187,9 @@ def main():
         logger.info("\n\n------Model Selection\n")
 
         # Select Models
-        with st.container(height = 400):
-            st.markdown("<h3 style='text-align: left;padding-left: 5px;'>5.&nbsp;&nbsp;&nbsp;Training Configuration</h3><br>",unsafe_allow_html=True)   
+        breaks(1)
+        st.markdown("<h3 style='text-align: left;padding-left: 5px;'>5.&nbsp;&nbsp;&nbsp;Training Configuration</h3><br>",unsafe_allow_html=True) 
+        with st.container(height = 400):  
             if target_type == 'object':
                 models = get_categorical_models()
             else:

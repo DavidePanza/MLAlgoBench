@@ -62,32 +62,30 @@ def main():
     # Diata visualization
     if df is not None:
         st.markdown("<h3 style='text-align: left;padding-left: 15px;'>2.&nbsp;&nbsp;&nbsp;Visual Data Exploration</h3><br>",unsafe_allow_html=True)
-        c1, _, = st.columns([.2, 1])
-        with c1:
-            with st.expander("Click here for data visualisation"):
+        with st.expander("Click here for data visualisation"):
+            breaks(1)
+            # Display data histograms
+            col_arg1, _, col_arg2, _, _ = st.columns([1, .1, 1, 1, 1])
+            with col_arg1:
+                bins = st.number_input("Number os bins:", min_value=5, max_value=150, value=30)
+            with col_arg2:
+                col_x_row = st.number_input("Histogram per row:", min_value=2, max_value=6, value=5)
+            plot_histograms(df,col_x_row,bins)
+        
+            # Display correlation matrix
+            if df.select_dtypes(include=['number']).shape[1] > 1:
                 breaks(1)
-                # Display data histograms
-                col_arg1, _, col_arg2, _, _ = st.columns([1, .1, 1, 1, 1])
-                with col_arg1:
-                    bins = st.number_input("Number os bins:", min_value=5, max_value=150, value=30)
-                with col_arg2:
-                    col_x_row = st.number_input("Histogram per row:", min_value=2, max_value=6, value=5)
-                plot_histograms(df,col_x_row,bins)
-            
-                # Display correlation matrix
-                if df.select_dtypes(include=['number']).shape[1] > 1:
-                    breaks(1)
-                    if df.select_dtypes(include=['number']).shape[1] > 10:
-                        matrix_size = 2.4
-                    else:
-                        matrix_size = 1.6
-                    _, col_corr1, _, col_corr2, _, = st.columns([.15,.4, .1, matrix_size, .6])
-                    with col_corr1:
-                        breaks(3)
-                        zmin = st.number_input("Min value for correlation matrix:", min_value=-1, max_value=1, value=-1)
-                        zmax = st.number_input("Max value for correlation matrix:", min_value=-1, max_value=1, value=1)
-                    with col_corr2:
-                        plot_correlation_matrix(df.select_dtypes(include=['number']),zmin,zmax)
+                if df.select_dtypes(include=['number']).shape[1] > 10:
+                    matrix_size = 2.4
+                else:
+                    matrix_size = 1.6
+                _, col_corr1, _, col_corr2, _, = st.columns([.15,.4, .1, matrix_size, .6])
+                with col_corr1:
+                    breaks(3)
+                    zmin = st.number_input("Min value for correlation matrix:", min_value=-1, max_value=1, value=-1)
+                    zmax = st.number_input("Max value for correlation matrix:", min_value=-1, max_value=1, value=1)
+                with col_corr2:
+                    plot_correlation_matrix(df.select_dtypes(include=['number']),zmin,zmax)
     breaks(1)
 
     # Target Selection

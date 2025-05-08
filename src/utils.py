@@ -1,5 +1,6 @@
 import streamlit as st
 import base64
+import os
 
 def configure_page() -> None:
     """
@@ -44,7 +45,11 @@ def load_background_image():
     """
     Loads and displays a background image with an overlaid title.
     """
-    image_path = "../images/background4.jpeg"  
+    current_dir = os.path.dirname(__file__)  # Get the current file's directory
+    image_path = os.path.join(current_dir, "..", "images", "background4.jpeg")
+    
+    if not os.path.exists(image_path):
+        raise FileNotFoundError(f"Image not found at: {image_path}") 
     base64_image = get_base64_encoded_image(image_path)
     
     # Inject CSS for the background and title overlay

@@ -98,8 +98,29 @@ def load_background_image():
     st.markdown(
         """
         <div class="bg-container">
-            <div class="overlay-title">Overview</div>
+            <div class="overlay-title">ML Models Benchmarker</div>
         </div>
         """,
         unsafe_allow_html=True
     )
+
+def page_description():
+    """
+    Displays a description of the app's functionality with numbered steps.
+    """
+    steps = [
+        "<strong>Load Data</strong> – Upload your own CSV or Excel file, or explore preloaded datasets.",
+        "<strong>Explore Data</strong> – Visualize distributions, check correlations, and inspect data quality.",
+        "<strong>Select Target & Features</strong> – Choose your prediction target and relevant input variables.",
+        "<strong>Preprocess</strong> – Handle missing values, remove outliers, test normality, and manage categorical features.",
+        "<strong>Train Models</strong> – Choose from classification or regression algorithms and configure test/train splits.",
+        "<strong>Compare Performance</strong> – Benchmark model performance using multiple evaluation metrics and interactive plots.",
+    ]
+
+    html = "<p style='font-size: 16px;'>This app helps you build and evaluate machine learning models step by step. You can:</p><ol style='font-size: 16px;'>"
+    for step in steps:
+        html += f"<li>{step}</li>"
+    html += "</ol>"
+
+    st.markdown(html, unsafe_allow_html=True)
+

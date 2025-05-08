@@ -20,17 +20,19 @@ def main():
     configure_page()
     load_background_image()
     breaks(2)
-    st.write("This app compares the performance of different machine learning algorithms.")
-    breaks(1)
+    page_description()
 
     # Logging
-    logger, log_stream = configure_logging()  # Get logger and log stream
-    logging_level = st.selectbox("Select logging level", ['INFO', 'DEBUG', 'WARNING'])
-    toggle_logging(logging_level, logger)
+    use_logging = False
+    logger, log_stream = configure_logging() # Get logger and log stream
+    if use_logging:
+        logging_level = st.selectbox("Select logging level", ['INFO', 'DEBUG', 'WARNING'])
+        toggle_logging(logging_level, logger)
     breaks(2)   
 
     # Upload user file
-    with st.container(height=650):
+    with st.container(height=750):
+        st.markdown("<h3 style='text-align: left;padding-left: 5px;'>1.&nbsp;&nbsp;&nbsp;Data Loading</h3><br>",unsafe_allow_html=True)
         st.write("Upload your data or experiment with one of the datasets provided:")
         df = upload_files()
         breaks(2)
@@ -59,37 +61,40 @@ def main():
 
     # Diata visualization
     if df is not None:
-        with st.expander("Visual Data Exploration"):
-            breaks(1)
-            # Display data histograms
-            col_arg1, _, col_arg2, _, _ = st.columns([1, .1, 1, 1, 1])
-            with col_arg1:
-                bins = st.number_input("Number os bins:", min_value=5, max_value=150, value=30)
-            with col_arg2:
-                col_x_row = st.number_input("Histogram per row:", min_value=2, max_value=6, value=5)
-            plot_histograms(df,col_x_row,bins)
-        
-            # Display correlation matrix
-            if df.select_dtypes(include=['number']).shape[1] > 1:
+        st.markdown("<h3 style='text-align: left;padding-left: 15px;'>2.&nbsp;&nbsp;&nbsp;Visual Data Exploration</h3><br>",unsafe_allow_html=True)
+        c1, _, = st.columns([.2, 1])
+        with c1:
+            with st.expander("Click here for data visualisation"):
                 breaks(1)
-                if df.select_dtypes(include=['number']).shape[1] > 10:
-                    matrix_size = 2.4
-                else:
-                    matrix_size = 1.6
-                _, col_corr1, _, col_corr2, _, = st.columns([.15,.4, .1, matrix_size, .6])
-                with col_corr1:
-                    breaks(3)
-                    zmin = st.number_input("Min value for correlation matrix:", min_value=-1, max_value=1, value=-1)
-                    zmax = st.number_input("Max value for correlation matrix:", min_value=-1, max_value=1, value=1)
-                with col_corr2:
-                    plot_correlation_matrix(df.select_dtypes(include=['number']),zmin,zmax)
+                # Display data histograms
+                col_arg1, _, col_arg2, _, _ = st.columns([1, .1, 1, 1, 1])
+                with col_arg1:
+                    bins = st.number_input("Number os bins:", min_value=5, max_value=150, value=30)
+                with col_arg2:
+                    col_x_row = st.number_input("Histogram per row:", min_value=2, max_value=6, value=5)
+                plot_histograms(df,col_x_row,bins)
+            
+                # Display correlation matrix
+                if df.select_dtypes(include=['number']).shape[1] > 1:
+                    breaks(1)
+                    if df.select_dtypes(include=['number']).shape[1] > 10:
+                        matrix_size = 2.4
+                    else:
+                        matrix_size = 1.6
+                    _, col_corr1, _, col_corr2, _, = st.columns([.15,.4, .1, matrix_size, .6])
+                    with col_corr1:
+                        breaks(3)
+                        zmin = st.number_input("Min value for correlation matrix:", min_value=-1, max_value=1, value=-1)
+                        zmax = st.number_input("Max value for correlation matrix:", min_value=-1, max_value=1, value=1)
+                    with col_corr2:
+                        plot_correlation_matrix(df.select_dtypes(include=['number']),zmin,zmax)
     breaks(1)
 
     # Target Selection
     feat_container_height = 450 if df.columns.shape[0] > 10 else 350
     with st.container(height = feat_container_height):
         breaks(1)
-        st.markdown("<h3 style='text-align: left;padding-left: 30px;'>Target and Features Selection</h3><br>",unsafe_allow_html=True)
+        st.markdown("<h3 style='text-align: left;padding-left: 5px;'>3.&nbsp;&nbsp;&nbsp;Target and Features Selection</h3><br>",unsafe_allow_html=True)
         
         _, col2, col3, col4, _ = st.columns([.2, 1, 1, 1, .2])
         with col4:
@@ -123,7 +128,7 @@ def main():
 
         # Missing Values and Outliers
         breaks(1)
-        st.markdown("<h3 style='text-align: left;padding-left: 30px;'>Data Preprocessing</h3><br>", unsafe_allow_html=True)
+        st.markdown("<h3 style='text-align: left;padding-left: 5px;'>4.&nbsp;&nbsp;&nbsp;Data Preprocessing</h3><br>",unsafe_allow_html=True)
         _, col_p2, _, col_p4, _ = st.columns([.1, 1, .4, 1, .1])
         with col_p2:
             drop_cols_missing= st.radio("Do you want to drop columns with missing values?", ("Yes", "No"),  index=1)
@@ -188,7 +193,7 @@ def main():
         breaks(1)
         with st.container(height = 400):
             breaks(1)
-            st.markdown("<h3 style='text-align: left;padding-left: 30px;'>Training Configuration</h3><br>", unsafe_allow_html=True)    
+            st.markdown("<h3 style='text-align: left;padding-left: 5px;'>5.&nbsp;&nbsp;&nbsp;Training Configuration</h3><br>",unsafe_allow_html=True)   
             if target_type == 'object':
                 models = get_categorical_models()
             else:
@@ -226,13 +231,14 @@ def main():
 
     # Results visualization
     if st.session_state.get("preprocessed", False) and st.session_state.get("model trained", False):
-        st.markdown("<h1 style='text-align: center;'>Results</h1><br>", unsafe_allow_html=True)
+        st.markdown("<h1 style='text-align: center;'>6.&nbsp;&nbsp;Results</h1><br>", unsafe_allow_html=True)
         metric = st.selectbox("Select Metric", st.session_state.metrics_name)
         breaks(1)
         plot_results(st.session_state.results_df,  metric)
 
     # Display logs
-    display_logs(log_stream)
+    if use_logging:
+        display_logs(log_stream)
 
 
 if __name__ == "__main__":

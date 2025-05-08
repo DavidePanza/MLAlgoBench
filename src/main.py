@@ -125,7 +125,6 @@ def main():
         logger.info("\n\n------Starting data preprocessing process\n")
 
         # Missing Values and Outliers
-        breaks(1)
         st.markdown("<h3 style='text-align: left;padding-left: 5px;'>4.&nbsp;&nbsp;&nbsp;Data Preprocessing</h3><br>",unsafe_allow_html=True)
         _, col_p2, _, col_p4, _ = st.columns([.1, 1, .4, 1, .1])
         with col_p2:
@@ -188,9 +187,7 @@ def main():
         logger.info("\n\n------Model Selection\n")
 
         # Select Models
-        breaks(1)
         with st.container(height = 400):
-            breaks(1)
             st.markdown("<h3 style='text-align: left;padding-left: 5px;'>5.&nbsp;&nbsp;&nbsp;Training Configuration</h3><br>",unsafe_allow_html=True)   
             if target_type == 'object':
                 models = get_categorical_models()

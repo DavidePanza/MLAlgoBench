@@ -32,7 +32,7 @@ def main():
 
     # Upload user file
     st.markdown("<h3 style='text-align: left;padding-left: 5px;'>1.&nbsp;&nbsp;&nbsp;Data Loading</h3><br>",unsafe_allow_html=True)
-    with st.container(height=750):
+    with st.container(height=600):
         st.write("Upload your data or experiment with one of the datasets provided:")
         df = upload_files()
         breaks(2)
@@ -91,8 +91,9 @@ def main():
     # Target Selection
     breaks(1)
     st.markdown("<h3 style='text-align: left;padding-left: 5px;'>3.&nbsp;&nbsp;&nbsp;Target and Features Selection</h3><br>",unsafe_allow_html=True)
-    feat_container_height = 450 if df.columns.shape[0] > 10 else 350
+    feat_container_height = 350 if df.columns.shape[0] > 10 else 250
     with st.container(height = feat_container_height):
+        breaks(1)
         _, col2, col3, col4, _ = st.columns([.2, 1, 1, 1, .2])
         with col4:
             target, target_type = select_target(df)
@@ -120,8 +121,9 @@ def main():
 
     breaks(1)
     st.markdown("<h3 style='text-align: left;padding-left: 5px;'>4.&nbsp;&nbsp;&nbsp;Data Preprocessing</h3><br>",unsafe_allow_html=True)
-    with st.container(height = 400):
-        
+    with st.container(height = 300):
+        breaks(1)
+
         # ---- Data Preprocessing ----
         logger.info("\n\n------Starting data preprocessing process\n")
 
@@ -189,7 +191,8 @@ def main():
         # Select Models
         breaks(1)
         st.markdown("<h3 style='text-align: left;padding-left: 5px;'>5.&nbsp;&nbsp;&nbsp;Training Configuration</h3><br>",unsafe_allow_html=True) 
-        with st.container(height = 400):  
+        with st.container(height = 300):  
+            breaks(1)
             if target_type == 'object':
                 models = get_categorical_models()
             else:
